@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+    stats_server:
+        build:
+            context: ./stats_server
+        image: haidaansko/soa-stats-server
+        ports:
+            - 5000:5000
+        environment:
+            - RABBITMQ_HOST=rabbitmq_server
+        depends_on: 
+            rabbitmq_server:
+                condition: service_healthy
+        links:
+            - rabbitmq_server
+
+    
+
+    rabbitmq_server:
+        image: rabbitmq:3-alpine
+        container_name: rabbitmq_server
+        hostname: rabbitmq_server
+        ports:
+            - 5672:5672
+            - 15672:15672
+        healthcheck:
+            test: rabbitmq-diagnostics -q ping
+            interval: 10s
+            timeout: 10s
+            retries: 3
